@@ -13,9 +13,9 @@
         <form asp-action="Edit">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
-                <label asp-for="Id" class="control-label"></label>
-                <input asp-for="Id" class="form-control" />
-                <span asp-validation-for="Id" class="text-danger"></span>
+                <label asp-for="IdVol" class="control-label"></label>
+                <input asp-for="IdVol" class="form-control" />
+                <span asp-validation-for="IdVol" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="Reference" class="control-label"></label>
@@ -29,8 +29,8 @@
             </div>
             <div class="form-group">
                 <label asp-for="VilleDepart" class="control-label"></label>
-                <input asp-for="VilleDepart" class="form-control" />
-                <span asp-validation-for="VilleDepart" class="text-danger"></span>
+                @* <input asp-for="VilleDepart" class="form-control" /> *@
+                <select asp-for="VilleDepart" class="form-control" asp-items="ViewBag.Ville"></select>
             </div>
             <div class="form-group">
                 <label asp-for="DateArrivee" class="control-label"></label>
@@ -39,8 +39,8 @@
             </div>
             <div class="form-group">
                 <label asp-for="VilleArrivee" class="control-label"></label>
-                <input asp-for="VilleArrivee" class="form-control" />
-                <span asp-validation-for="VilleArrivee" class="text-danger"></span>
+                @* <input asp-for="VilleArrivee" class="form-control" /> *@
+                <select asp-for="VilleArrivee" class="form-control" asp-items="ViewBag.Ville"></select>
             </div>
             <div class="form-group">
                 <input type="submit" value="Save" class="btn btn-primary" />

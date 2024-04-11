@@ -7,6 +7,7 @@ using Newtonsoft.Json.Linq;
 using Newtonsoft.Json;
 using AirNoSQL.Models;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using FireSharp.Exceptions;
 
 namespace AirNoSQL.Controllers
 {
@@ -41,8 +42,11 @@ namespace AirNoSQL.Controllers
         public ActionResult Details(string id)
         {
             client = new FireSharp.FirebaseClient(config);
-            FirebaseResponse response = client.Get("Ville");
-            return View();
+            FirebaseResponse response = client.Get("Ville/" + id);
+            Ville? ville = JsonConvert.DeserializeObject<Ville>(response.Body);
+            dynamic? data = JsonConvert.DeserializeObject<dynamic>(response.Body);
+
+            return View(ville);
         }
 
         // GET: VilleController/Create
@@ -54,58 +58,69 @@ namespace AirNoSQL.Controllers
         // POST: VilleController/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(IFormCollection collection)
+        public ActionResult Create(Ville ville)
         {
             try
             {
-                return RedirectToAction(nameof(Index));
+                client = new FireSharp.FirebaseClient(config);
+                PushResponse response = client.Push("Ville/" + ville.IdVille, ville);
+
+                ville.IdVille = response.Result.name;
+                SetResponse set = client.Set("Ville/" + ville.IdVille, ville);
+
+                if(set.StatusCode == System.Net.HttpStatusCode.OK)
+                {
+                    ModelState.AddModelError("Ok", "Tout marche");
+                }
+                else
+                {
+                    ModelState.AddModelError("Error", "Tout ne marche pas");
+                }
             }
-            catch
+            catch (Exception ex)
             {
-                return View();
+                ModelState.AddModelError("Error", ex.Message);
             }
+
+            return RedirectToAction("Index");
         }
 
         // GET: VilleController/Edit/5
-        public ActionResult Edit(int id)
+        public ActionResult Edit(string id)
         {
-            return View();
+            client = new FireSharp.FirebaseClient(config);
+            FirebaseResponse response = client.Get("Ville/" + id);
+            Ville ville = JsonConvert.DeserializeObject<Ville>(response.Body);
+            return View(ville);
         }
 
         // POST: VilleController/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
+        public ActionResult Edit(string id, Ville ville)
         {
-            try
-            {
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
+            client = new FireSharp.FirebaseClient(config);
+            SetResponse response = client.Set("Ville/" + ville.IdVille, ville);
+            return RedirectToAction("Index");
         }
 
         // GET: VilleController/Delete/5
-        public ActionResult Delete(int id)
+        public ActionResult Delete(string id)
         {
-            return View();
+            client = new FireSharp.FirebaseClient(config);
+            FirebaseResponse response = client.Get("Ville/" + id);
+            Ville ville = JsonConvert.DeserializeObject<Ville>(response.Body);
+            return View(ville);
         }
 
         // POST: VilleController/Delete/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
+        public ActionResult Delete(string id, Ville ville)
         {
-            try
-            {
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
+            client = new FireSharp.FirebaseClient(config);
+            FirebaseResponse response = client.Delete("Ville/" + id);
+            return RedirectToAction("Index");
         }
     }
 }
